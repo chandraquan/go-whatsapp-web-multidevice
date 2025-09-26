@@ -1,16 +1,16 @@
 FROM golang:1.24
 
-# Set working directory
 WORKDIR /app
-
-# Copy isi folder src ke dalam container
 COPY ./src ./
 
-# Download dependency
+# deps & build
 RUN go mod tidy
-
-# Build binary
 RUN go build -o server .
 
-# Run binary
-CMD ["./server"]
+# folder default untuk sqlite (opsional tapi bagus)
+RUN mkdir -p /app/storages
+
+# Jalankan REST server.
+# Catatan: array CMD tidak expand env var, jadi pakai sh -c agar ${PORT} bisa kebaca.
+# Flag lain diambil dari ENV yang sudah kamu set di Koyeb: APP_BASIC_AUTH, APP_ACCOUNT_VALIDATION, WHATSAPP_* (lihat catatan di bawah).
+CMD ["sh", "-c", "./server rest --port ${PORT:-3000}"]
